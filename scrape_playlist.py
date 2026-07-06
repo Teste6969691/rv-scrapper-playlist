@@ -108,7 +108,7 @@ def click_next_playlist_page(driver: webdriver.Chrome) -> bool:
         WebDriverWait(driver, 10).until(
             lambda d: d.find_element(By.CSS_SELECTOR, "#playlist_view_playlist_view_items").get_attribute("innerHTML") != before_html
         )
-        time.sleep(1.5)
+        time.sleep(0.5)
         return True
     except Exception:
         return False
@@ -174,7 +174,7 @@ def collect_playlist_links(playlist_url: str, index_file: Path, headless: bool, 
         if not click_next_playlist_page(driver):
             break
 
-        time.sleep(delay)
+        time.sleep(max(0.1, delay / 4))
 
     save_video_index(index_file, entries)
     print(f"{len(entries)} links salvos em {index_file}")
@@ -317,7 +317,7 @@ def download_from_index(index_file: Path, output_dir: Path, headless: bool, dela
         try:
             driver.switch_to.new_window("tab")
             driver.get(video_url)
-            time.sleep(1)
+            time.sleep(0.4)
 
             title = get_page_title(driver)
             print(f"[{index}/{len(entries)}] Baixando: {title}")
@@ -328,7 +328,7 @@ def download_from_index(index_file: Path, output_dir: Path, headless: bool, dela
                     video_url_to_download = extract_video_url(driver)
                     if video_url_to_download and video_url_to_download.startswith("http"):
                         break
-                    time.sleep(0.5)
+                    time.sleep(0.2)
 
             if not video_url_to_download:
                 video_url_to_download = extract_video_url(driver)
@@ -347,7 +347,7 @@ def download_from_index(index_file: Path, output_dir: Path, headless: bool, dela
             driver.close()
             driver.switch_to.window(playlist_handle)
             if delay > 0:
-                time.sleep(max(0.5, delay / 2))
+                time.sleep(max(0.1, delay / 5))
         except Exception as exc:
             print(f"Erro ao processar {video_url}: {exc}")
             try:
